@@ -1,0 +1,6 @@
+{
+  "name": "Administrasi Guru Pintar",
+  "description": "Sistem Otomatisasi Analisis TP, ATP (Peta), PPM (Modul), PROMES & PROTA berbasis AI Powered.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
