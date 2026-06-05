@@ -12,6 +12,7 @@ import { PPMTab } from "./components/PPMTab";
 import { PromesTab } from "./components/PromesTab";
 import { ProtaTab } from "./components/ProtaTab";
 import { AnalisisItem, AnalisisResponse } from "./types";
+import { generateAnalisis } from "./utils/geminiClient";
 import { BookOpen, Sparkles, AlertCircle, LayoutDashboard, Database, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -64,25 +65,15 @@ export default function App() {
     setActiveTab("analisis"); // Switch to analysis view to show loader
 
     try {
-      const response = await fetch("/api/generate-analisis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cp: cpInput,
-          fase,
-          mapel,
-          guru,
-          sekolah,
-          customApiKey: customApiKey.trim(),
-        }),
+      const data = await generateAnalisis({
+        cp: cpInput,
+        fase,
+        mapel,
+        guru,
+        sekolah,
+        customApiKey,
       });
 
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.error || "Gagal memperoleh hasil analisis dari AI Server.");
-      }
-
-      const data: AnalisisResponse = await response.json();
       setSemester1(data.semester1 || []);
       setSemester2(data.semester2 || []);
     } catch (err: any) {

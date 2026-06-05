@@ -3,6 +3,7 @@ import { Download, Layers, Sparkles, BookOpen, Clock, Users, Globe2, AlertCircle
 import { motion, AnimatePresence } from "motion/react";
 import { AnalisisItem, PPMModul } from "../types";
 import { exportToWord } from "../utils/export";
+import { generatePpm } from "../utils/geminiClient";
 
 interface PPMTabProps {
   analisisData: AnalisisItem[];
@@ -26,30 +27,19 @@ export function PPMTab({ analisisData, sekolah, guru, mapel, fase, customApiKey 
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/generate-ppm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          no: item.no,
-          tp: item.tp,
-          cp: item.cp,
-          materi: item.materi,
-          kbc_value: item.kbc_value,
-          lintas_disiplin: item.lintas_disiplin,
-          fase,
-          sekolah,
-          guru,
-          mapel,
-          customApiKey: customApiKey.trim(),
-        }),
+      const data = await generatePpm({
+        no: item.no,
+        tp: item.tp,
+        cp: item.cp,
+        materi: item.materi,
+        kbc_value: item.kbc_value,
+        lintas_disiplin: item.lintas_disiplin,
+        fase,
+        sekolah,
+        guru,
+        mapel,
+        customApiKey,
       });
-
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.error || "Gagal generate modul dari server-side API.");
-      }
-
-      const data: PPMModul = await response.json();
       setModulData(data);
     } catch (err: any) {
       console.error(err);
