@@ -11,20 +11,28 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Initialize Gemini SDK with telemetry User-Agent header
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      "User-Agent": "aistudio-build",
+// Helper function to dynamically initialize Gemini based on incoming or system API key
+function getGoogleGenAIClient(customKey?: string) {
+  const apiKey = (customKey && customKey.trim()) || process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
+    throw new Error(
+      "Kunci API Gemini tidak ditemukan. Jika Anda menjalankan aplikasi ini di GitHub / lokal, silakan masukkan Kunci API Gemini Anda di kolom konfigurasi 'Kunci API Gemini' terlebih dahulu atau atur environment variable GEMINI_API_KEY."
+    );
+  }
+  return new GoogleGenAI({
+    apiKey: apiKey,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      },
     },
-  },
-});
+  });
+}
 
 // API Endpoint: Generate Curriculum Analysis (TP Ganjil & Genap)
 app.post("/api/generate-analisis", async (req, res) => {
   try {
-    const { cp, fase, mapel, guru, sekolah } = req.body;
+    const { cp, fase, mapel, guru, sekolah, customApiKey } = req.body;
 
     if (!cp) {
       return res.status(400).json({ error: "Capaian Pembelajaran (CP) is required" });
@@ -82,7 +90,8 @@ Hasilkan respon JSON dengan format schema berikut:
 `;
 
     // Perform analysis with gemini-3.5-flash
-    const response = await ai.models.generateContent({
+    const aiClient = getGoogleGenAIClient(customApiKey);
+    const response = await aiClient.models.generateContent({
       model: "gemini-3.5-flash",
       contents: prompt,
       config: {
@@ -146,7 +155,7 @@ Hasilkan respon JSON dengan format schema berikut:
 // API Endpoint: Generate Perencanaan Pembelajaran Mendalam (PPM / Modul Ajar)
 app.post("/api/generate-ppm", async (req, res) => {
   try {
-    const { no, tp, cp, materi, kbc_value, lintas_disiplin, fase, sekolah, guru, mapel } = req.body;
+    const { no, tp, cp, materi, kbc_value, lintas_disiplin, fase, sekolah, guru, mapel, customApiKey } = req.body;
 
     if (!tp || !materi) {
       return res.status(400).json({ error: "TP and Materi are required" });
@@ -249,7 +258,8 @@ Hasilkan respon JSON dengan format schema berikut:
 }
 `;
 
-    const response = await ai.models.generateContent({
+    const aiClient = getGoogleGenAIClient(customApiKey);
+    const response = await aiClient.models.generateContent({
       model: "gemini-3.5-flash",
       contents: prompt,
       config: {

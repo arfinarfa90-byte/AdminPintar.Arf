@@ -21,6 +21,15 @@ const CONTOH_CP = `Peserta didik mampu menganalisis sejarah lahirnya Pancasila; 
 export default function App() {
   const [activeTab, setActiveTab] = React.useState<string>("data");
   
+  // Custom API key for standalone/GitHub execution
+  const [customApiKey, setCustomApiKey] = React.useState<string>(() => {
+    return localStorage.getItem("AG_GEMINI_API_KEY") || "";
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem("AG_GEMINI_API_KEY", customApiKey);
+  }, [customApiKey]);
+  
   // Form States
   const [sekolah, setSekolah] = React.useState<string>("SMK Negeri 1 Kudus");
   const [guru, setGuru] = React.useState<string>("Drs. HARMAJI, M.Pd");
@@ -64,11 +73,13 @@ export default function App() {
           mapel,
           guru,
           sekolah,
+          customApiKey: customApiKey.trim(),
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Gagal memperoleh hasil analisis dari AI Server.");
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || "Gagal memperoleh hasil analisis dari AI Server.");
       }
 
       const data: AnalisisResponse = await response.json();
@@ -203,6 +214,8 @@ export default function App() {
                 setCpInput={setCpInput}
                 onGenerate={handleGenerateAnalisis}
                 isLoading={isLoading}
+                customApiKey={customApiKey}
+                setCustomApiKey={setCustomApiKey}
               />
             )}
 
@@ -233,6 +246,7 @@ export default function App() {
                 guru={guru}
                 mapel={mapel}
                 fase={fase}
+                customApiKey={customApiKey}
               />
             )}
 

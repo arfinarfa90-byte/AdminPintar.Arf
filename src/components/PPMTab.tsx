@@ -10,9 +10,10 @@ interface PPMTabProps {
   guru: string;
   mapel: string;
   fase: string;
+  customApiKey: string;
 }
 
-export function PPMTab({ analisisData, sekolah, guru, mapel, fase }: PPMTabProps) {
+export function PPMTab({ analisisData, sekolah, guru, mapel, fase, customApiKey }: PPMTabProps) {
   const [selectedTP, setSelectedTP] = React.useState<AnalisisItem | null>(null);
   const [modulData, setModulData] = React.useState<PPMModul | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -39,11 +40,13 @@ export function PPMTab({ analisisData, sekolah, guru, mapel, fase }: PPMTabProps
           sekolah,
           guru,
           mapel,
+          customApiKey: customApiKey.trim(),
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Gagal generate modul dari server-side API.");
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || "Gagal generate modul dari server-side API.");
       }
 
       const data: PPMModul = await response.json();

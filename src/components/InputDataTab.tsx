@@ -17,6 +17,8 @@ interface InputDataTabProps {
   setCpInput: (val: string) => void;
   onGenerate: (e: React.FormEvent) => void;
   isLoading: boolean;
+  customApiKey: string;
+  setCustomApiKey: (val: string) => void;
 }
 
 export function InputDataTab({
@@ -34,6 +36,8 @@ export function InputDataTab({
   setCpInput,
   onGenerate,
   isLoading,
+  customApiKey,
+  setCustomApiKey,
 }: InputDataTabProps) {
   return (
     <motion.div
@@ -58,16 +62,31 @@ export function InputDataTab({
             {/* Server API Key Status Badge */}
             <div className="rounded-2xl bg-teal-50/70 border border-teal-100 p-4">
               <div className="flex items-start gap-2.5">
-                <ShieldCheck className="mt-0.5 h-5 w-5 text-teal-600 shrink-0" />
+                <ShieldCheck className="mt-0.5 h-4 w-4 text-teal-600 shrink-0" />
                 <div>
-                  <h4 className="text-xs font-bold text-teal-900 uppercase tracking-wide">
+                  <h4 className="text-[10px] font-bold text-teal-900 uppercase tracking-wide">
                     Gemini AI Active
                   </h4>
-                  <p className="mt-1 text-xs text-teal-700 leading-normal">
-                    Kunci API terkonfigurasi otomatis di server-side. Aman, cepat, dan siap digunakan.
+                  <p className="mt-0.5 text-[11px] text-teal-700 leading-normal">
+                    Kunci API terkonfigurasi otomatis di server-side. Jika dijalankan di GitHub/hosting mandiri, silakan isi opsi di bawah ini.
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Optional Gemini API Key Input */}
+            <div className="space-y-1.5 rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5">
+              <label htmlFor="api-key-input" className="ml-1 text-[11px] font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-1">
+                Kunci API Gemini <span className="text-[10px] text-indigo-500 font-normal lowercase">(opsional di github)</span>
+              </label>
+              <input
+                id="api-key-input"
+                type="password"
+                value={customApiKey}
+                onChange={(e) => setCustomApiKey(e.target.value)}
+                placeholder="Masukkan API Key Gemini..."
+                className="w-full rounded-xl border border-slate-100 bg-white p-3 text-xs font-semibold text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-200 focus:ring-2 focus:ring-indigo-100"
+              />
             </div>
 
             <div className="space-y-2">
